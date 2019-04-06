@@ -1,28 +1,40 @@
-from sklearn.model_selection import KFold
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import KFold, GridSearchCV
+from sklearn.pipeline import Pipeline
 from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import KFold, RandomizedSearchCV
+import pickle
 import pandas as pd
 import os
 
 
 class CreateModels:
     @staticmethod
-    def create(model):
-        for file in os.listdir('lib/models'):
-            os.remove(os.path.join('lib/models', file))
+    def create(model, param):
+        cur_model_file = os.path.join('lib/models', model.__class__.__name__ + '.pickle')
+        if os.path.exists(cur_model_file):
+            os.remove(cur_model_file)
         train = pd.read_csv('lib/blindedData/blindedTrainSample.csv')
-
         X_train = train.drop(['y'], axis=1)
         y_train = train['y']
 
-        kf = KFold(n_splits=3)
-        train_index, test_index = next(kf.split(X_train))
+        blind_test = pd.read_csv('lib/blindedData/blindedTestSample.csv')
+        X_blind_test = blind_test.drop(['y'], axis=1)
+        y_blind_test = blind_test['y']
+        kf = KFold(n_splits=10)
+        pipeline = Pipeline(steps=[('norm', StandardScaler()), ('model', model)])
 
-        X_train_validate, X_test_validate = X_train.iloc[train_index, :], X_train.iloc[test_index, :]
-        y_train_validate, y_test_validate = y_train.iloc[train_index], y_train.iloc[test_index]
+        optimizedModel = RandomizedSearchCV(pipeline, param, cv=kf, scoring='neg_mean_squared_error')
+        optimizedModel.fit(X_train, y_train)
 
-        model.fit(X_train_validate, y_train_validate)
-        y_pred_fit = model.predict(X_train_validate)
-        y_pred_validate = model.predict(X_test_validate)
-        fit_score = mean_squared_error(y_train_validate, y_pred_fit)
-        validate_score = mean_squared_error(y_test_validate, y_pred_validate)
-        print("%s: fit mse = %.2f and validate mse = %.2f" % (model.__class__.__name__, fit_score, validate_score))
+        y_pred_fit = optimizedModel.predict(X_train)
+        y_pred_test = optimizedModel.predict(X_blind_test)
+
+        fit_score = mean_squared_error(y_train, y_pred_fit)
+        test_score = mean_squared_error(y_pred_test, y_blind_test)
+
+        print("%s: fit mse = %.2f and test mse = %.2f" % (model.__class__.__name__, fit_score, test_score))
+
+        file = open(cur_model_file, 'wb')
+        pickle.dump(optimizedModel, file)
+        file.close()
