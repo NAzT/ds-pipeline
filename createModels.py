@@ -27,6 +27,8 @@ class CreateModels:
         optimizedModel = RandomizedSearchCV(pipeline, param, cv=kf, scoring='neg_mean_squared_error')
         optimizedModel.fit(X_train, y_train)
 
+        print(optimizedModel.best_params_)
+
         y_pred_fit = optimizedModel.predict(X_train)
         y_pred_test = optimizedModel.predict(X_blind_test)
 
