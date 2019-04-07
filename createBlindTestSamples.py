@@ -6,6 +6,7 @@ from sklearn import datasets
 
 
 class CreateBlindTestSamples:
+    @staticmethod
     def create():
         for file in os.listdir('lib/blindedData'):
             os.remove(os.path.join('lib/blindedData', file))

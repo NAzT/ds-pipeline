@@ -4,7 +4,6 @@ from flask import Flask, jsonify
 from flask import request
 import pandas as pd
 
-import api.estimationService
 from api.estimationService import GetResources
 
 app = Flask(__name__)
