@@ -1,10 +1,7 @@
-from collections import OrderedDict
-
-from flask import Flask, jsonify
-from flask import request
 import pandas as pd
-
-from api.estimationService import GetResources
+from flask import Flask, jsonify, request
+from estimationService import GetResources
+from collections import OrderedDict
 
 app = Flask(__name__)
 app.model = GetResources.getModel()
