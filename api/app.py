@@ -12,6 +12,7 @@ def predict():
     # Store the query-string argument in the arg_list variable and then convert its format to pandas dataframe
     arg_list = request.args.to_dict(flat=False)
     query_df = pd.DataFrame.from_dict(OrderedDict(arg_list))
+    print(arg_list)
     for feat in query_df.columns:
         if isinstance(query_df[feat], object):
             query_df[feat] = query_df[feat].str.replace(",", "").astype("float64")

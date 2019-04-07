@@ -7,7 +7,7 @@ WORKDIR /home/project/app
 
 COPY . /home/project/app
 COPY ./model /home/project/app/model
-COPY requirements.txt /home/project/app
+COPY ./requirements.txt /home/project/app
 
 RUN pip3 install --no-cache-dir -r ./requirements.txt
  
