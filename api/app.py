@@ -20,6 +20,7 @@ def predict():
         query_df[feat] = query_df[feat].astype("float64")
     # For each model, generated the estimated value.
     try:
+        print(query_df)
         predict_val = app.model.predict(query_df).astype('float64')[0]
         return jsonify(predict=str(predict_val))
     except:

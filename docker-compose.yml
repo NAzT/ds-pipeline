@@ -4,8 +4,8 @@ services:
     container_name: estimation-api
     restart: always
     build: ./api
-    expose:
-      - "5000"
+    ports:
+      - "5000:5000"
     command: gunicorn -w 1 -b :5000 app:app
   nginx:
     container_name: nginx
